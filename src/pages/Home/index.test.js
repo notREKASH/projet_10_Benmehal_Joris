@@ -65,6 +65,7 @@ describe("When a page is created", () => {
 
     expect(footerElement).toBeInTheDocument();
     expect(eventCardElement).toBeInTheDocument();
+    expect(footerElement).toContainElement(eventCardElement);
     expect(eventMonth).toBe("août");
   });
 });
