@@ -1,5 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Home from "./index";
+import { DataProvider } from "../../contexts/DataContext";
+import events from "../../../public/events.json";
+import { getMonth } from "../../helpers/Date";
 
 describe("When Form is created", () => {
   it("a list of fields card is displayed", async () => {
@@ -42,10 +45,26 @@ describe("When a page is created", () => {
     render(<Home />);
     screen.getByTestId("footer-testid");
   });
-  it("an event card, with the last event, is displayed", () => {
-    render(<Home />);
-    const footerElement = screen.getByTestId("footer-testid");
-    const eventCardElement = screen.getByTestId("card-testid");
-    expect(footerElement).toContainElement(eventCardElement);
+  it("an event card, with the last event, is displayed", async () => {
+    const { findByTestId } = render(
+      <DataProvider>
+        <Home />
+      </DataProvider>
+    );
+
+    const footerElement = await findByTestId("footer-testid");
+    const eventCardElement = await findByTestId("card-testid");
+
+    const latestEvent = events.events.reduce((latest, event) => {
+      if (!latest) return event;
+
+      return new Date(latest.date) > new Date(event.date) ? latest : event;
+    }, events.events[0]);
+
+    const eventMonth = getMonth(new Date(latestEvent.date));
+
+    expect(footerElement).toBeInTheDocument();
+    expect(eventCardElement).toBeInTheDocument();
+    expect(eventMonth).toBe("août");
   });
 });
